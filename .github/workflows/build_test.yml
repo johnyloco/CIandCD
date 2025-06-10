@@ -1,52 +1,52 @@
-  name: Build and test
+name: Build and test
 
-  on:
-    push:
-      branches: [ "master" ]
-    pull_request:
-      branches: [ "master" ]
-    workflow_dispatch:
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
 
-  jobs:
-    unit-tests:
+jobs:
+  unit-tests:
 
-      runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+      with:
+        submodules: false
+        clean: true
+        fetch-depth: 0
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Install dependencies
+      run: npm install
+    - name: Run integration tests
+      run: npm test
+
+  security-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-         submodules: false
-         clean: true
-         fetch-depth: 0
+          submodules: false
+          clean: true
+          fetch-depth: 0
+
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: Install dependencies
         run: npm install
-      - name: Run integration tests
-        run: npm test
 
-    security-tests:
-      needs: unit-tests
-      runs-on: ubuntu-latest
-
-      steps:
-        - name: Checkout the repository
-          uses: actions/checkout@v4
-          with:
-            submodules: false
-            clean: true
-            fetch-depth: 0
-
-        - name: Use Node.js 20
-          uses: actions/setup-node@v4
-          with:
-            node-version: 20
-
-        - name: Install dependencies
-          run: npm install
-
-        - name: Run security tests
-          run: npm audit
+      - name: Run security tests
+        run: npm audit
